@@ -16,9 +16,9 @@ import (
 )
 
 func main() {
-	source := flag.String("source", "", "source page")
+	source := flag.String("source", "", "source url or file")
+	target := flag.String("target", "", "target file")
 	sitedomain := flag.String("sitedomain", "", "site domain")
-	hivdomain := flag.String("hivdomain", "", "hiv domain")
 	flag.Parse()
 
 	if len(*source) == 0 {
@@ -27,8 +27,8 @@ func main() {
 		os.Exit(1)
 	}
 
-	if len(*hivdomain) == 0 {
-		os.Stderr.WriteString("hivdomain is required\n")
+	if len(*target) == 0 {
+		os.Stderr.WriteString("target is required\n")
 		flag.Usage()
 		os.Exit(1)
 	}
@@ -41,27 +41,27 @@ func main() {
 
 	os.Stdout.WriteString(fmt.Sprintf("Converting %s ...\n", *source))
 
-	c := command.NewFetchCommand(*source, *hivdomain)
-	trgt, err := c.Exec()
+	c := command.NewFetchCommand(*source, *target)
+	err := c.Exec()
 	if err != nil {
 		os.Stderr.WriteString(err.Error() + "\n")
 		os.Exit(1)
 	}
 
-	c2 := command.NewReplaceLinkCommand(trgt, *sitedomain)
+	c2 := command.NewReplaceLinkCommand(*target, *sitedomain)
 	err = c2.Exec()
 	if err != nil {
 		os.Stderr.WriteString(err.Error() + "\n")
 		os.Exit(1)
 	}
 
-	c3 := command.NewAddClickcounterCommand(trgt)
+	c3 := command.NewAddClickcounterCommand(*target)
 	err = c3.Exec()
 	if err != nil {
 		os.Stderr.WriteString(err.Error() + "\n")
 		os.Exit(1)
 	}
 
-	os.Stdout.WriteString(fmt.Sprintf("%s written.\n", trgt))
+	os.Stdout.WriteString(fmt.Sprintf("%s written.\n", *target))
 	return
 }

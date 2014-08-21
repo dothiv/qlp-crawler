@@ -10,18 +10,18 @@ import (
 )
 
 type FetchCommand struct {
-	source    string
-	hivdomain string
+	source string
+	target string
 }
 
-func NewFetchCommand(source string, hivdomain string) (c *FetchCommand) {
+func NewFetchCommand(source string, target string) (c *FetchCommand) {
 	c = new(FetchCommand)
 	c.source = source
-	c.hivdomain = hivdomain
+	c.target = target
 	return
 }
 
-func (c *FetchCommand) Exec() (target string, err error) {
+func (c *FetchCommand) Exec() (err error) {
 	var sourcefile *os.File
 	sourcefile, err = util.LoadUri(c.source)
 	if err != nil {
@@ -35,8 +35,7 @@ func (c *FetchCommand) Exec() (target string, err error) {
 		return
 	}
 
-	target = c.hivdomain + ".hiv.html"
-	err = ioutil.WriteFile(target, data, 0644)
+	err = ioutil.WriteFile(c.target, data, 0644)
 	if err != nil {
 		return
 	}
